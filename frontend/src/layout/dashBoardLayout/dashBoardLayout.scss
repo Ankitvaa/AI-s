@@ -1,0 +1,27 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent body scroll */
+  }
+  
+  .dashBoardLayout {
+    display: flex;
+    gap: 50px;
+    height: 100vh; /* Full viewport height */
+    padding-top: 20px;
+  }
+  
+  .menu {
+    flex: 1;
+    overflow-y: auto; /* Enable scroll for the menu if needed */
+    padding: 10px;
+  }
+  
+  .content {
+    flex: 4;
+    background-color: #12101b;
+    overflow-y: auto; /* Enable scroll for the content area if needed */
+    padding: 20px; /* Add some padding inside the content */
+  }
+  
