@@ -2,44 +2,40 @@ import React from "react";
 import "./dashBoard.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-// import { useAuth } from "@clerk/clerk-react";  // Uncomment if you're using Clerk for authentication
 
 const DashBoard = () => {
-  // const { userId } = useAuth();  // Uncomment if using Clerk
 
-  const navigate = useNavigate();
+   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
-    mutationFn: async (text) => {
-      const response = await fetch("http://localhost:5000/api/chats/", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      }).then(res=>res.json());
-// 
-      if (!response.ok) {
-        throw new Error("Failed to create a new chat");
-      }
 
-      const data = await response.json();
-      return data; // Assuming your API returns an object with the chat ID
-    },
-    onSuccess: (data) => {
-      // Assuming the returned data has an 'id' field
-      if (data && data.id) {
-        queryClient.invalidateQueries({ queryKey: ["userChats"] });
-        navigate(`/dashboard/chats/${data.id}`);
-      }
-    },
-    onError: (error) => {
-      console.error("Error creating chat:", error);
-      alert("Failed to create a new chat");
-    },
-  });
+const mutation = useMutation({
+  mutationFn: async (text) => {
+    const response = await fetch("http://localhost:5000/api/chats/", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    const id = await response.json();
+    if (!response.ok) {
+      throw new Error("Failed to create chat");
+    }
+    return id;  // Return the data containing the new chat ID
+  },
+  onSuccess: (id) => {
+    if (id) {
+      queryClient.invalidateQueries({ queryKey: ["userChats"] });
+      navigate(`/dashboard/chats/${id}`);
+    }
+  },
+  onError: (error) => {
+    console.error("Error creating chat:", error);
+    // alert("Failed to create a new chat");
+  },
+});
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     const text = e.target.text.value;
     if (!text) return;
@@ -60,7 +56,7 @@ const DashBoard = () => {
             <span>Create A New Chat</span>
           </div>
           <div className="option">
-            <img src="/image.png" alt="Image Analysis" />
+            <img src="/image.png" alt="Analysis" />
             <span>Analyze Image</span>
           </div>
           <div className="option">

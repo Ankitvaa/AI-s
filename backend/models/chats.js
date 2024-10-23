@@ -4,26 +4,26 @@ const chatSchema = new mongoose.Schema(
     {
         userId: {
             type: String,
-            required: true,  // Fixed the typo from 'require' to 'required'
+            required: true,
         },
         history: [
             {
                 role: {
                     type: String,
-                    enum: [ "user", "model" ],  // Corrected enum type
-                    required: true,  // Fixed the typo from 'require' to 'required'
+                    enum: [ "user", "model" ],
+                    required: true,
                 },
                 parts: [
                     {
                         text: {
                             type: String,
-                            required: true,  // Fixed the typo from 'require' to 'required'
+                            required: true,
                         },
                     },
                 ],
                 img: {
                     type: String,
-                    required: false,  // 'required' is optional for this field
+                    required: false,
                 },
             },
         ],
@@ -31,5 +31,4 @@ const chatSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Export the model
-export default mongoose.models.Chat || mongoose.model("Chat", chatSchema);
+export default mongoose.models.chat || mongoose.model("chat", chatSchema);

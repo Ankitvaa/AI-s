@@ -7,7 +7,7 @@ import {
 
 const ChatList = () => {
   const { isPending, error, data } = useQuery({
-    queryKey: ['repoData'],
+    queryKey: ['userChats'],
     queryFn: () =>
       fetch("http://localhost:5000/api/userchats",{
         credentials:"include"

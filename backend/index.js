@@ -12,8 +12,6 @@ dotenv.config();
 const port = process.env.port || 5000;
 const app = express();
 
-console.log("Clerk Publishable Key:", process.env.CLERK_PUBLISHABLE_KEY);
-
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
@@ -105,31 +103,108 @@ app.get("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
 
 app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
+  const { id } = req.params;
+
+  // Check if the id is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).send("Invalid chat ID format.");
+  }
+
   try {
-    const chat = await Chat.findOne({ _id: req.params.id, userId });
+    const chat = await Chat.findOne({ _id: id, userId });
     if (chat) {
       res.status(200).send(chat);
     } else {
       res.status(404).send("Chat not found or unauthorized.");
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Error fetching Chat!");
+    console.error(error);
+    res.status(500).send("Error fetching chat!");
   }
 });
+
+
+// app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
+//   const userId = req.auth.userId; // Get user ID from authentication
+//   const { question, answer, img } = req.body; // Extract question, answer, and image from the request body
+
+//   // Create new items to be added to the chat history
+//   const newItems = [
+//     ...(question
+//       ? [ { role: "user", parts: [ { text: question } ], ...(img && { img }) } ]
+//       : []),
+//     { role: "model", parts: [ { text: answer } ] },
+//   ];
+
+//   try {
+//     // Check if the chat exists and belongs to the user
+//     const chat = await Chat.findOne({ _id: req.params.id, userId });
+//     if (!chat) {
+//       return res.status(404).json({ message: "Chat not found or you do not have access." });
+//     }
+
+//     // Update the chat's history by pushing new items
+//     chat.history.push(...newItems);
+//     await chat.save();
+
+//     // Send back the updated chat
+//     res.status(200).json(chat);
+//   } catch (err) {
+//     console.error("Error adding conversation:", err);
+//     res.status(500).json({ message: "Error adding conversation!" });
+//   }
+// });
+
+
+app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
+  const userId = req.auth.userId; // Get user ID from authentication
+  const { question, answer, img } = req.body; // Extract question, answer, and image from the request body
+
+  // Check if question and answer are provided
+  if (!answer) {
+    return res.status(400).json({ message: "Answer is required." });
+  }
+
+  // Create new items to be added to the chat history
+  const newItems = [
+    ...(question
+      ? [ { role: "user", parts: [ { text: question } ], ...(img && { img }) } ]
+      : []),
+    { role: "model", parts: [ { text: answer } ] },  // Ensure answer is provided here
+  ];
+
+  try {
+    // Check if the chat exists and belongs to the user
+    const chat = await Chat.findOne({ _id: req.params.id, userId });
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found or you do not have access." });
+    }
+
+    // Update the chat's history by pushing new items
+    chat.history.push(...newItems);
+    await chat.save();
+
+    // Send back the updated chat
+    res.status(200).json(chat);
+  } catch (err) {
+    console.error("Error adding conversation:", err);
+    res.status(500).json({ message: "Error adding conversation!" });
+  }
+});
+
+
+
 
 // MongoDB connection
 const connect = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGO_URL);
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("MongoDB Connection Error: ", error);
   }
 };
+
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

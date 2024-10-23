@@ -7,8 +7,8 @@ const UserchatsSchema = new mongoose.Schema({
     chats: [
         {
 
-            _id: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
-            title: { type: String },
+            _id: { type: mongoose.Schema.Types.ObjectId, ref: "chat" },
+            title: { type: String, require: true },
 
             createdAt: {
                 type: Date,
