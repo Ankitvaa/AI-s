@@ -16,18 +16,16 @@ const NewPrompt = ({ data }) => {
     aiData: {},
   });
 
-  const chat = model.startChat({
-    history: [
-      {
-        role: "user",
-        parts: [{ text: "Hello" }],
-      },
-      {
-        role: "model",
-        parts: [{ text: "Great to meet you. What would you like to know?" }],
-      },
-    ],
-  });
+const chat = model.startChat({
+  history: data?.history.map(({ role, parts }) => ({
+    role, // Make sure role is passed correctly
+    parts: parts.map(({ text }) => ({ text })), // Ensure parts are mapped correctly
+  })),
+  generationConfig: {
+    // maxOutputTokens: 100,
+  },
+});
+
 
   const [question, setQuestion] = useState("");
   const [ans, setAns] = useState("");
