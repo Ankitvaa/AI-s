@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon --env-file .env index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build":"npm i"
   },
   "keywords": [],
   "author": "",
