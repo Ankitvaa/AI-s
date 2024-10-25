@@ -21,9 +21,6 @@ const chat = model.startChat({
     role, // Make sure role is passed correctly
     parts: parts.map(({ text }) => ({ text })), // Ensure parts are mapped correctly
   })),
-  generationConfig: {
-    // maxOutputTokens: 100,
-  },
 });
 
 
